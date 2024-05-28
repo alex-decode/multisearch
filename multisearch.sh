@@ -136,7 +136,7 @@ print_matching_lines() {
     local file="$1"
     shift
     local pattern=$(IFS="|"; echo "${*}")
-    grep $grep_options -E "$pattern" "$file"
+    grep --color=always $grep_options -E "$pattern" "$file"
 }
 
 # Find command to search files with optional extension filtering
