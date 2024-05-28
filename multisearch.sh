@@ -12,6 +12,7 @@ print_help() {
     echo "    -p, --path         Specify the search path (default is current directory)."
     echo "    -h, --help         Print this help message."
     echo "    -l, --lines        Print the lines that contain the given strings."
+    echo "    -n, --line-numbers Show line numbers."
     echo "    -t, --type <ext>   Search only files with the given extension."
     echo "    -i, --ignore-case  Perform case-insensitive search."
     echo "    -s, --strict       Show results only when all of the listed strings are present in a file."
@@ -36,6 +37,7 @@ ignore_case=true
 match_type="two"
 context_before=0
 context_after=0
+show_line_numbers=false
 
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
@@ -71,6 +73,9 @@ while [[ "$#" -gt 0 ]]; do
         -A)
             context_after="$2"
             shift
+            ;;
+        -n|--line-numbers)
+            show_line_numbers=true
             ;;
         *)
             if [[ "$1" =~ ^- ]]; then
@@ -136,7 +141,10 @@ print_matching_lines() {
     local file="$1"
     shift
     local pattern=$(IFS="|"; echo "${*}")
-    grep --color=always $grep_options -E "$pattern" "$file"
+    local grep_command="grep --color=always"
+    [ "$show_line_numbers" = true ] && grep_command+=" -n"
+    grep_command+=" $grep_options -E \"$pattern\" \"$file\""
+    eval "$grep_command"
 }
 
 # Find command to search files with optional extension filtering
@@ -179,3 +187,4 @@ eval "$find_command" | while read -r file; do
             ;;
     esac
 done
+
